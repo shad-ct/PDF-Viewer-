@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MyPdfViewer (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MyPdfViewer (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

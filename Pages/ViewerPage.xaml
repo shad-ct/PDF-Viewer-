@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="MyPdfViewer.Pages.ViewerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyPdfViewer.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="Transparent"
+    mc:Ignorable="d">
+
+    <!--  ═══════════════════════════════════════════════════════════════════════
+          ROOT GRID — two rows: CommandBar (auto) + Viewer (*)
+          ═══════════════════════════════════════════════════════════════════════ -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  ═══════════════════════════════════════════════════════════════════
+              ROW 0 — COMMAND BAR (annotation tool palette)
+              ═══════════════════════════════════════════════════════════════════ -->
+        <CommandBar
+            x:Name="AnnotationCommandBar"
+            Grid.Row="0"
+            HorizontalAlignment="Left"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            DefaultLabelPosition="Right">
+
+            <!--  Open PDF file  -->
+            <AppBarButton
+                x:Name="BtnOpenFile"
+                Click="BtnOpenFile_Click"
+                Icon="OpenFile"
+                Label="Open PDF" />
+
+            <AppBarSeparator />
+
+            <!--  Selection mode  -->
+            <AppBarToggleButton
+                x:Name="BtnSelection"
+                Checked="AnnotationTool_Checked"
+                Icon="TouchPointer"
+                Label="Select"
+                Tag="selection"
+                Unchecked="AnnotationTool_Unchecked" />
+
+            <!--  Highlight  -->
+            <AppBarToggleButton
+                x:Name="BtnHighlight"
+                Checked="AnnotationTool_Checked"
+                Label="Highlight"
+                Tag="highlight"
+                Unchecked="AnnotationTool_Unchecked">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE7E6;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <!--  Underline  -->
+            <AppBarToggleButton
+                x:Name="BtnUnderline"
+                Checked="AnnotationTool_Checked"
+                Label="Underline"
+                Tag="underline"
+                Unchecked="AnnotationTool_Unchecked">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE8D2;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <!--  Freehand Draw  -->
+            <AppBarToggleButton
+                x:Name="BtnFreehand"
+                Checked="AnnotationTool_Checked"
+                Label="Draw"
+                Tag="freehand"
+                Unchecked="AnnotationTool_Unchecked">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xED63;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <!--  Draw Rectangle  -->
+            <AppBarToggleButton
+                x:Name="BtnRectangle"
+                Checked="AnnotationTool_Checked"
+                Label="Rectangle"
+                Tag="rectangle"
+                Unchecked="AnnotationTool_Unchecked">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE7FB;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <!--  Add Comment  -->
+            <AppBarToggleButton
+                x:Name="BtnComment"
+                Checked="AnnotationTool_Checked"
+                Label="Comment"
+                Tag="comment"
+                Unchecked="AnnotationTool_Unchecked">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE8F2;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
+
+            <AppBarSeparator />
+
+            <!--  Clear ink on current page  -->
+            <AppBarButton
+                x:Name="BtnClearInk"
+                Click="BtnClearInk_Click"
+                Label="Clear Ink">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE74D;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+
+            <!--  Save bookmark  -->
+            <AppBarButton
+                x:Name="BtnBookmark"
+                Click="BtnBookmark_Click"
+                Label="Bookmark">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE8A4;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+
+            <!--  Zoom level indicator  -->
+            <CommandBar.SecondaryCommands>
+                <AppBarButton
+                    x:Name="BtnZoomIn"
+                    Click="BtnZoomIn_Click"
+                    Icon="ZoomIn"
+                    Label="Zoom In" />
+                <AppBarButton
+                    x:Name="BtnZoomOut"
+                    Click="BtnZoomOut_Click"
+                    Icon="ZoomOut"
+                    Label="Zoom Out" />
+                <AppBarButton
+                    x:Name="BtnZoomReset"
+                    Click="BtnZoomReset_Click"
+                    Icon="Refresh"
+                    Label="Reset Zoom" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+
+        <!--  ═══════════════════════════════════════════════════════════════════
+              ROW 1 — SCROLL VIEWER + PDF PAGE CONTAINER
+              Zoom, horizontal scroll, and vertical scroll all enabled.
+              ═══════════════════════════════════════════════════════════════════ -->
+        <ScrollViewer
+            x:Name="PdfScrollViewer"
+            Grid.Row="1"
+            HorizontalScrollBarVisibility="Auto"
+            HorizontalScrollMode="Enabled"
+            VerticalScrollBarVisibility="Auto"
+            VerticalScrollMode="Enabled"
+            ZoomMode="Enabled">
+
+            <!--  PdfPageContainer: filled programmatically in code-behind.
+                  Each child is itself a multi-layer Grid (Base/Interaction/Annotation).
+                  Minimum width/height keep the ScrollViewer content from collapsing.  -->
+            <StackPanel
+                x:Name="PdfPageContainer"
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                Spacing="16">
+
+                <!--  Placeholder displayed while no PDF is loaded  -->
+                <Grid
+                    x:Name="EmptyStatePlaceholder"
+                    Width="640"
+                    Height="480"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16">
+                        <FontIcon
+                            FontSize="64"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Glyph="&#xEA90;" />
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="20"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="Open a PDF to begin" />
+                        <Button
+                            x:Name="EmptyOpenButton"
+                            HorizontalAlignment="Center"
+                            Click="BtnOpenFile_Click"
+                            Content="Open PDF File"
+                            Style="{ThemeResource AccentButtonStyle}" />
+                    </StackPanel>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!--  Comment flyout — anchored to canvas, shown when comment tool is active  -->
+        <TeachingTip
+            x:Name="CommentInputTip"
+            Title="Add Comment"
+            IsLightDismissEnabled="True"
+            PlacementMargin="8"
+            PreferredPlacement="Bottom">
+            <TeachingTip.Content>
+                <StackPanel Spacing="8" Width="300">
+                    <TextBox
+                        x:Name="CommentTextBox"
+                        AcceptsReturn="True"
+                        Header="Comment"
+                        MaxHeight="120"
+                        PlaceholderText="Type your comment here…"
+                        TextWrapping="Wrap" />
+                    <Button
+                        x:Name="CommentSaveBtn"
+                        HorizontalAlignment="Right"
+                        Click="CommentSaveBtn_Click"
+                        Content="Save"
+                        Style="{ThemeResource AccentButtonStyle}" />
+                </StackPanel>
+            </TeachingTip.Content>
+        </TeachingTip>
+    </Grid>
+</Page>
