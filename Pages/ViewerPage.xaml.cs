@@ -15,6 +15,8 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.Media.Ocr;
+using Windows.Graphics.Imaging;
 
 namespace MyPdfViewer.Pages;
 
@@ -188,14 +190,29 @@ public sealed partial class ViewerPage : Page
             var bitmap = new BitmapImage();
             await bitmap.SetSourceAsync(stream);
 
+            // Decodes stream and runs OCR
+            OcrResult? ocrResult = null;
+            try
+            {
+                stream.Seek(0);
+                var decoder = await BitmapDecoder.CreateAsync(stream);
+                using var softwareBitmap = await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+                var ocrEngine = OcrEngine.TryCreateFromUserProfileLanguages();
+                if (ocrEngine != null)
+                {
+                    ocrResult = await ocrEngine.RecognizeAsync(softwareBitmap);
+                }
+            }
+            catch { }
+
             PdfPageContainer.Children.Add(
-                BuildPageGrid(bitmap, pdfPage.Size.Width, pdfPage.Size.Height, (int)i));
+                BuildPageGrid(bitmap, pdfPage.Size.Width, pdfPage.Size.Height, (int)i, ocrResult));
         }
     }
 
     // ─── Three-layer page factory ─────────────────────────────────────────────
 
-    private Grid BuildPageGrid(BitmapImage bitmap, double pw, double ph, int pageIndex)
+    private Grid BuildPageGrid(BitmapImage bitmap, double pw, double ph, int pageIndex, OcrResult? ocrResult)
     {
         var outer = new Grid
         {
@@ -219,15 +236,67 @@ public sealed partial class ViewerPage : Page
         Canvas.SetZIndex(img, 0);
         outer.Children.Add(img);
 
-        // LAYER 1 — Transparent hit-test passthrough overlay
-        var passthrough = new Grid
+        // LAYER 1 — Transparent hit-test selection overlay (containing selectable TextBoxes)
+        var passthrough = new Canvas
         {
             Width = pw,
             Height = ph,
             Background = new SolidColorBrush(Colors.Transparent),
-            IsHitTestVisible = false
+            IsHitTestVisible = true
         };
         Canvas.SetZIndex(passthrough, 1);
+
+        if (ocrResult != null)
+        {
+            foreach (var line in ocrResult.Lines)
+            {
+                if (line.Words == null || line.Words.Count == 0) continue;
+
+                double minX = double.MaxValue;
+                double minY = double.MaxValue;
+                double maxX = double.MinValue;
+                double maxY = double.MinValue;
+
+                foreach (var word in line.Words)
+                {
+                    minX = Math.Min(minX, word.BoundingRect.Left);
+                    minY = Math.Min(minY, word.BoundingRect.Top);
+                    maxX = Math.Max(maxX, word.BoundingRect.Right);
+                    maxY = Math.Max(maxY, word.BoundingRect.Bottom);
+                }
+
+                if (minX == double.MaxValue || minY == double.MaxValue) continue;
+
+                var lineRect = new Rect(minX, minY, maxX - minX, maxY - minY);
+
+                var textBox = new TextBox
+                {
+                    Text = line.Text,
+                    IsReadOnly = true,
+                    Background = new SolidColorBrush(Colors.Transparent),
+                    Foreground = new SolidColorBrush(Colors.Transparent),
+                    BorderThickness = new Thickness(0),
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(0),
+                    Width = lineRect.Width,
+                    Height = lineRect.Height,
+                    FontSize = Math.Max(6, lineRect.Height * 0.8),
+                    TextWrapping = TextWrapping.NoWrap
+                };
+                textBox.Resources["TextBoxBackground"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextBoxBackgroundPointerOver"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextBoxBackgroundFocused"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextBoxBorderBrush"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextBoxBorderBrushPointerOver"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextBoxBorderBrushFocused"] = new SolidColorBrush(Colors.Transparent);
+                textBox.Resources["TextControlBorderThickness"] = new Thickness(0);
+
+                Canvas.SetLeft(textBox, lineRect.X);
+                Canvas.SetTop(textBox, lineRect.Y);
+                passthrough.Children.Add(textBox);
+            }
+        }
+
         outer.Children.Add(passthrough);
 
         // LAYER 2 — Annotation canvas (pointer events + drawn shapes)
