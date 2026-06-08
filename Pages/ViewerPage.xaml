@@ -9,350 +9,55 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
-    <Page.Resources>
-        <ThemeShadow x:Key="SharedShadow" />
-    </Page.Resources>
-
-    <!--  Root Grid — CommandBar and ScrollViewer share the same cell (floating overlay)  -->
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!--  ══════════════════════════════════════════════════════════════════
-              PDF SCROLL CANVAS — padded so floating bar doesn't occlude content
-              ══════════════════════════════════════════════════════════════════ -->
-        <ScrollViewer
-            x:Name="PdfScrollViewer"
-            Padding="0,58,0,0"
-            HorizontalScrollBarVisibility="Auto"
-            HorizontalScrollMode="Enabled"
-            VerticalScrollBarVisibility="Auto"
-            VerticalScrollMode="Enabled"
-            ZoomMode="Enabled">
+        <CommandBar x:Name="ViewerCommandBar" DefaultLabelPosition="Right" IsOpen="False">
+            <AppBarButton
+                x:Name="BtnOpenFile"
+                Click="BtnOpenFile_Click"
+                Icon="OpenFile"
+                Label="Open PDF" />
+            <AppBarButton
+                x:Name="BtnAddToFolder"
+                Click="BtnAddToFolder_Click"
+                IsEnabled="False"
+                Label="Add to Folder">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE8B7;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarSeparator />
+            <AppBarButton
+                x:Name="BtnBookmark"
+                Click="BtnBookmark_Click"
+                IsEnabled="False"
+                Label="Bookmark">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE8A4;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </CommandBar>
 
+        <WebView2 x:Name="PdfWebView" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+        <Grid
+            Grid.Row="1"
+            x:Name="EmptyStatePlaceholder"
+            Width="640"
+            Height="460"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            CornerRadius="12">
             <StackPanel
-                x:Name="PdfPageContainer"
                 HorizontalAlignment="Center"
-                Orientation="Vertical"
-                Padding="0,16,0,40"
-                Spacing="20">
-
-                <!--  Empty state shown when no PDF is loaded  -->
-                <Grid
-                    x:Name="EmptyStatePlaceholder"
-                    Width="640"
-                    Height="460"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    CornerRadius="12">
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="16">
-                        <FontIcon
-                            FontSize="72"
-                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                            Glyph="&#xEA90;" />
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            FontSize="22"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Text="Open a PDF to get started" />
-                        <Button
-                            x:Name="EmptyOpenButton"
-                            HorizontalAlignment="Center"
-                            Click="BtnOpenFile_Click"
-                            Content="Open PDF File"
-                            Style="{ThemeResource AccentButtonStyle}" />
-                    </StackPanel>
-                </Grid>
-
+                VerticalAlignment="Center"
+                Spacing="16">
+                <TextBlock Text="Open a PDF to get started" />
+                <Button Click="BtnOpenFile_Click" Content="Open PDF File" HorizontalAlignment="Center"/>
             </StackPanel>
-        </ScrollViewer>
-
-        <!--  ══════════════════════════════════════════════════════════════════
-              FLOATING COMMAND BAR — overlays the top of the scroll canvas
-              ══════════════════════════════════════════════════════════════════ -->
-        <Border
-            VerticalAlignment="Top"
-            Background="{ThemeResource LayerFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-            BorderThickness="0,0,0,1"
-            Shadow="{StaticResource SharedShadow}"
-            Translation="0,0,4">
-
-            <CommandBar
-                x:Name="AnnotationCommandBar"
-                HorizontalAlignment="Left"
-                DefaultLabelPosition="Right"
-                IsOpen="False"
-                OverflowButtonVisibility="Visible">
-
-                <!--  Open file  -->
-                <AppBarButton
-                    x:Name="BtnOpenFile"
-                    Click="BtnOpenFile_Click"
-                    Icon="OpenFile"
-                    Label="Open PDF" />
-
-                <!--  Add to folder (enabled when PDF is loaded)  -->
-                <AppBarButton
-                    x:Name="BtnAddToFolder"
-                    Click="BtnAddToFolder_Click"
-                    IsEnabled="False"
-                    Label="Add to Folder">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE8B7;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-
-                <AppBarSeparator />
-
-                <!--  SELECTION tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnSelection"
-                    Checked="AnnotationTool_Checked"
-                    Label="Select"
-                    Tag="selection"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xEF20;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  HIGHLIGHT tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnHighlight"
-                    Checked="AnnotationTool_Checked"
-                    Label="Highlight"
-                    Tag="highlight"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xE7E6;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  UNDERLINE tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnUnderline"
-                    Checked="AnnotationTool_Checked"
-                    Label="Underline"
-                    Tag="underline"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xE8D2;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  FREEHAND / PEN tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnFreehand"
-                    Checked="AnnotationTool_Checked"
-                    Label="Pen"
-                    Tag="freehand"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xED63;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  STRAIGHT LINE tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnLine"
-                    Checked="AnnotationTool_Checked"
-                    Label="Line"
-                    Tag="line"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xE71B;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  RECTANGLE tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnRectangle"
-                    Checked="AnnotationTool_Checked"
-                    Label="Rectangle"
-                    Tag="rectangle"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xE7FB;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <!--  COMMENT tool  -->
-                <AppBarToggleButton
-                    x:Name="BtnComment"
-                    Checked="AnnotationTool_Checked"
-                    Label="Comment"
-                    Tag="comment"
-                    Unchecked="AnnotationTool_Unchecked">
-                    <AppBarToggleButton.Icon>
-                        <FontIcon Glyph="&#xE8F2;" />
-                    </AppBarToggleButton.Icon>
-                </AppBarToggleButton>
-
-                <AppBarSeparator />
-
-                <!--  Clear all annotations  -->
-                <AppBarButton
-                    x:Name="BtnClearInk"
-                    Click="BtnClearInk_Click"
-                    Label="Clear">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE74D;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-
-                <!--  Bookmark current position  -->
-                <AppBarButton
-                    x:Name="BtnBookmark"
-                    Click="BtnBookmark_Click"
-                    IsEnabled="False"
-                    Label="Bookmark">
-                    <AppBarButton.Icon>
-                        <FontIcon Glyph="&#xE8A4;" />
-                    </AppBarButton.Icon>
-                </AppBarButton>
-
-                <!--  ═══ SECONDARY COMMANDS (overflow) ═══  -->
-                <CommandBar.SecondaryCommands>
-
-                    <!--  Pen / Freehand color picker  -->
-                    <AppBarButton x:Name="BtnPenColor" Label="Pen Color">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xED63;" />
-                        </AppBarButton.Icon>
-                        <AppBarButton.Flyout>
-                            <Flyout Placement="Bottom">
-                                <StackPanel Spacing="8" Width="290">
-                                    <TextBlock Text="Pen Color" Style="{ThemeResource CaptionTextBlockStyle}" />
-                                    <ColorPicker
-                                        x:Name="PenColorPicker"
-                                        ColorChanged="PenColorPicker_ColorChanged"
-                                        IsAlphaEnabled="False"
-                                        IsAlphaSliderVisible="False"
-                                        IsAlphaTextInputVisible="False"
-                                        IsMoreButtonVisible="False" />
-                                </StackPanel>
-                            </Flyout>
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-
-                    <!--  Highlight color picker  -->
-                    <AppBarButton x:Name="BtnHighlightColor" Label="Highlight Color">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xE7E6;" />
-                        </AppBarButton.Icon>
-                        <AppBarButton.Flyout>
-                            <Flyout Placement="Bottom">
-                                <StackPanel Spacing="8" Width="290">
-                                    <TextBlock Text="Highlight Color" Style="{ThemeResource CaptionTextBlockStyle}" />
-                                    <ColorPicker
-                                        x:Name="HighlightColorPicker"
-                                        ColorChanged="HighlightColorPicker_ColorChanged"
-                                        IsAlphaEnabled="True"
-                                        IsMoreButtonVisible="False" />
-                                </StackPanel>
-                            </Flyout>
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-
-                    <!--  Shape / Line color picker  -->
-                    <AppBarButton x:Name="BtnShapeColor" Label="Shape &amp; Line Color">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xE7FB;" />
-                        </AppBarButton.Icon>
-                        <AppBarButton.Flyout>
-                            <Flyout Placement="Bottom">
-                                <StackPanel Spacing="8" Width="290">
-                                    <TextBlock Text="Shape &amp; Line Color" Style="{ThemeResource CaptionTextBlockStyle}" />
-                                    <ColorPicker
-                                        x:Name="ShapeColorPicker"
-                                        ColorChanged="ShapeColorPicker_ColorChanged"
-                                        IsAlphaEnabled="False"
-                                        IsMoreButtonVisible="False" />
-                                </StackPanel>
-                            </Flyout>
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-
-                    <!--  Underline color picker  -->
-                    <AppBarButton x:Name="BtnUnderlineColor" Label="Underline Color">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xE8D2;" />
-                        </AppBarButton.Icon>
-                        <AppBarButton.Flyout>
-                            <Flyout Placement="Bottom">
-                                <StackPanel Spacing="8" Width="290">
-                                    <TextBlock Text="Underline Color" Style="{ThemeResource CaptionTextBlockStyle}" />
-                                    <ColorPicker
-                                        x:Name="UnderlineColorPicker"
-                                        ColorChanged="UnderlineColorPicker_ColorChanged"
-                                        IsAlphaEnabled="False"
-                                        IsMoreButtonVisible="False" />
-                                </StackPanel>
-                            </Flyout>
-                        </AppBarButton.Flyout>
-                    </AppBarButton>
-
-                    <AppBarSeparator />
-
-                    <AppBarButton
-                        x:Name="BtnZoomIn"
-                        Click="BtnZoomIn_Click"
-                        Icon="ZoomIn"
-                        Label="Zoom In" />
-                    <AppBarButton
-                        x:Name="BtnZoomOut"
-                        Click="BtnZoomOut_Click"
-                        Icon="ZoomOut"
-                        Label="Zoom Out" />
-                    <AppBarButton
-                        x:Name="BtnZoomReset"
-                        Click="BtnZoomReset_Click"
-                        Icon="Refresh"
-                        Label="Reset Zoom (100%)" />
-
-                </CommandBar.SecondaryCommands>
-            </CommandBar>
-        </Border>
-
-        <!--  Comment flyout  -->
-        <TeachingTip
-            x:Name="CommentInputTip"
-            Title="Add Comment"
-            Grid.RowSpan="2"
-            IsLightDismissEnabled="True"
-            PlacementMargin="12"
-            PreferredPlacement="BottomRight">
-            <TeachingTip.Content>
-                <StackPanel Spacing="8" Width="300">
-                    <TextBox
-                        x:Name="CommentTextBox"
-                        AcceptsReturn="True"
-                        Header="Comment text"
-                        MaxHeight="120"
-                        PlaceholderText="Type your comment here…"
-                        TextWrapping="Wrap" />
-                    <Button
-                        x:Name="CommentSaveBtn"
-                        HorizontalAlignment="Right"
-                        Click="CommentSaveBtn_Click"
-                        Content="Save"
-                        Style="{ThemeResource AccentButtonStyle}" />
-                </StackPanel>
-            </TeachingTip.Content>
-        </TeachingTip>
-
-        <!--  Selection region info bar  -->
-        <InfoBar
-            x:Name="SelectionInfoBar"
-            Margin="0,60,16,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            IsClosable="True"
-            IsOpen="False"
-            Message="Drag to select a region. Switch to Highlight or Underline to apply annotation to the selection."
-            Severity="Informational"
-            Title="Text Selection" />
-
+        </Grid>
     </Grid>
 </Page>

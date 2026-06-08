@@ -27,17 +27,17 @@
                     Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                     Glyph="&#xE71D;" />
                 <TextBlock
+                    VerticalAlignment="Center"
                     Style="{ThemeResource TitleTextBlockStyle}"
-                    Text="All PDFs"
-                    VerticalAlignment="Center" />
+                    Text="All PDFs" />
             </StackPanel>
             <Button
                 x:Name="BtnAddPdf"
                 Grid.Column="1"
+                VerticalAlignment="Center"
                 Click="BtnAddPdf_Click"
                 Content="Open PDF"
-                Style="{ThemeResource AccentButtonStyle}"
-                VerticalAlignment="Center">
+                Style="{ThemeResource AccentButtonStyle}">
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Key="O" Modifiers="Control" />
                 </Button.KeyboardAccelerators>
@@ -63,12 +63,15 @@
 
                         <FontIcon
                             Grid.Column="0"
+                            VerticalAlignment="Center"
                             FontSize="24"
                             Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                            Glyph="&#xEA90;"
-                            VerticalAlignment="Center" />
+                            Glyph="&#xEA90;" />
 
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <StackPanel
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Spacing="2">
                             <TextBlock
                                 FontSize="13"
                                 FontWeight="SemiBold"
@@ -84,19 +87,19 @@
                         <!--  "Add to Folder" per-item button  -->
                         <Button
                             Grid.Column="2"
+                            VerticalAlignment="Center"
                             Click="AddToFolder_Click"
                             Tag="{Binding FileId}"
-                            ToolTipService.ToolTip="Add to Folder"
-                            VerticalAlignment="Center">
+                            ToolTipService.ToolTip="Add to Folder">
                             <FontIcon FontSize="13" Glyph="&#xE8B7;" />
                         </Button>
 
                         <FontIcon
                             Grid.Column="3"
+                            VerticalAlignment="Center"
                             FontSize="14"
                             Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                            Glyph="&#xE76C;"
-                            VerticalAlignment="Center" />
+                            Glyph="&#xE76C;" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
