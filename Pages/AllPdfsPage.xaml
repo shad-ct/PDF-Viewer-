@@ -16,38 +16,87 @@
         </Grid.RowDefinitions>
 
         <!--  Header  -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
-            <FontIcon FontSize="28" Glyph="&#xE71D;" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-            <TextBlock Text="All PDFs" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
-            <Button x:Name="BtnAddPdf" Content="Open PDF" Click="BtnAddPdf_Click"
-                    Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="16,0,0,0">
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <FontIcon
+                    FontSize="28"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                    Glyph="&#xE71D;" />
+                <TextBlock
+                    Style="{ThemeResource TitleTextBlockStyle}"
+                    Text="All PDFs"
+                    VerticalAlignment="Center" />
+            </StackPanel>
+            <Button
+                x:Name="BtnAddPdf"
+                Grid.Column="1"
+                Click="BtnAddPdf_Click"
+                Content="Open PDF"
+                Style="{ThemeResource AccentButtonStyle}"
+                VerticalAlignment="Center">
                 <Button.KeyboardAccelerators>
-                    <KeyboardAccelerator Modifiers="Control" Key="O" />
+                    <KeyboardAccelerator Key="O" Modifiers="Control" />
                 </Button.KeyboardAccelerators>
             </Button>
-        </StackPanel>
+        </Grid>
 
-        <!--  File list  -->
+        <!--  File list with per-item Add-to-Folder action  -->
         <ListView
             x:Name="PdfListView"
             Grid.Row="1"
-            SelectionMode="Single"
+            IsItemClickEnabled="True"
             ItemClick="PdfListView_ItemClick"
-            IsItemClickEnabled="True">
+            SelectionMode="Single">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="8,10" ColumnSpacing="12">
+                    <Grid Padding="4,10" ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Glyph="&#xEA90;" FontSize="24"
-                                  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                        <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{Binding}" />
-                        <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="14"
-                                  Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
+
+                        <FontIcon
+                            Grid.Column="0"
+                            FontSize="24"
+                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Glyph="&#xEA90;"
+                            VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Text="{Binding FileName}"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                FontSize="11"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                Text="{Binding LastOpenedDisplay}"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+
+                        <!--  "Add to Folder" per-item button  -->
+                        <Button
+                            Grid.Column="2"
+                            Click="AddToFolder_Click"
+                            Tag="{Binding FileId}"
+                            ToolTipService.ToolTip="Add to Folder"
+                            VerticalAlignment="Center">
+                            <FontIcon FontSize="13" Glyph="&#xE8B7;" />
+                        </Button>
+
+                        <FontIcon
+                            Grid.Column="3"
+                            FontSize="14"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Glyph="&#xE76C;"
+                            VerticalAlignment="Center" />
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>

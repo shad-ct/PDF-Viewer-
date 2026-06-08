@@ -15,6 +15,16 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        UnhandledException += (s, e) =>
+        {
+            try
+            {
+                System.IO.File.WriteAllText(
+                    System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "crash.txt"),
+                    e.Exception?.ToString() ?? e.Message);
+            }
+            catch { }
+        };
     }
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)

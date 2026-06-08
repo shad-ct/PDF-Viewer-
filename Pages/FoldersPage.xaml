@@ -9,51 +9,323 @@
     Background="Transparent"
     mc:Ignorable="d">
 
+    <Page.Resources>
+
+        <!--  ── Folder card (Grid view) ──────────────────────────────────────  -->
+        <DataTemplate x:Key="FolderGridTemplate">
+            <Grid
+                Width="140"
+                Height="130"
+                Margin="4"
+                Padding="12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="40"
+                    Text="{Binding Emoji}" />
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    FontSize="12"
+                    FontWeight="SemiBold"
+                    Text="{Binding FolderName}"
+                    TextAlignment="Center"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap" />
+                <Button
+                    Grid.Row="2"
+                    Margin="0,6,0,0"
+                    HorizontalAlignment="Center"
+                    Click="BtnDeleteFolder_Click"
+                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                    Style="{ThemeResource DefaultButtonStyle}"
+                    Tag="{Binding FolderId}">
+                    <FontIcon FontSize="12" Glyph="&#xE74D;" />
+                </Button>
+            </Grid>
+        </DataTemplate>
+
+        <!--  ── Folder row (List view) ───────────────────────────────────────  -->
+        <DataTemplate x:Key="FolderListTemplate">
+            <Grid Padding="4,10" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    FontSize="24"
+                    Text="{Binding Emoji}"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    Grid.Column="1"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Text="{Binding FolderName}"
+                    VerticalAlignment="Center" />
+                <Button
+                    Grid.Column="2"
+                    Click="BtnDeleteFolder_Click"
+                    Content="Delete"
+                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                    Tag="{Binding FolderId}" />
+            </Grid>
+        </DataTemplate>
+
+        <!--  ── File card (Grid view) ────────────────────────────────────────  -->
+        <DataTemplate x:Key="FileGridTemplate">
+            <Grid
+                Width="140"
+                Height="160"
+                Margin="4"
+                Padding="12"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <FontIcon
+                    Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="48"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                    Glyph="&#xEA90;" />
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Click="BtnRemoveFromFileFolder_Click"
+                    Tag="{Binding FileId}"
+                    ToolTipService.ToolTip="Remove from Folder"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="4"
+                    Margin="0,-4,-4,0">
+                    <FontIcon FontSize="11" Glyph="&#xE711;" />
+                </Button>
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    FontSize="11"
+                    FontWeight="SemiBold"
+                    Text="{Binding FileName}"
+                    TextAlignment="Center"
+                    TextTrimming="CharacterEllipsis" />
+                <TextBlock
+                    Grid.Row="2"
+                    HorizontalAlignment="Center"
+                    FontSize="10"
+                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                    Text="{Binding LastOpenedDisplay}"
+                    TextAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+
+        <!--  ── File row (List view) ─────────────────────────────────────────  -->
+        <DataTemplate x:Key="FileListTemplate">
+            <Grid Padding="4,10" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <FontIcon
+                    Grid.Column="0"
+                    FontSize="24"
+                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                    Glyph="&#xEA90;"
+                    VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Text="{Binding FileName}"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        FontSize="11"
+                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                        Text="{Binding LastOpenedDisplay}" />
+                </StackPanel>
+                <Button
+                    Grid.Column="2"
+                    Click="BtnRemoveFromFileFolder_Click"
+                    Tag="{Binding FileId}"
+                    ToolTipService.ToolTip="Remove from Folder"
+                    Background="Transparent"
+                    BorderThickness="0">
+                    <FontIcon FontSize="12" Glyph="&#xE711;" />
+                </Button>
+                <FontIcon
+                    Grid.Column="3"
+                    FontSize="14"
+                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                    Glyph="&#xE76C;"
+                    VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
     <Grid Margin="24,16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
-            <FontIcon FontSize="28" Glyph="&#xE8B7;" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-            <TextBlock Text="Virtual Folders" Style="{ThemeResource TitleTextBlockStyle}" VerticalAlignment="Center" />
-        </StackPanel>
-
-        <!--  Create folder row  -->
-        <Grid Grid.Row="1" Margin="0,0,0,16" ColumnSpacing="8">
+        <!--  ── Row 0: Page header + view toggle ─────────────────────────────  -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="FolderNameBox" Grid.Column="0" PlaceholderText="New folder name…" />
-            <Button Grid.Column="1" Content="Create" Click="BtnCreateFolder_Click"
-                    Style="{ThemeResource AccentButtonStyle}" />
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                <TextBlock
+                    x:Name="PageEmojiIcon"
+                    FontSize="28"
+                    Text="📁"
+                    VerticalAlignment="Center" />
+                <TextBlock
+                    x:Name="PageTitle"
+                    Style="{ThemeResource TitleTextBlockStyle}"
+                    Text="Virtual Folders"
+                    VerticalAlignment="Center" />
+                <!-- Folder Actions for opened virtual folder -->
+                <StackPanel x:Name="FolderActionsPanel" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Visibility="Collapsed">
+                    <Button x:Name="BtnImportToFolder" Click="BtnImportToFolder_Click" Style="{ThemeResource AccentButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontSize="12" Glyph="&#xE8B5;" />
+                            <TextBlock Text="Import PDFs" FontSize="12" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnRenameFolder" Click="BtnRenameFolder_Click" ToolTipService.ToolTip="Rename Folder">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontSize="12" Glyph="&#xE70F;" />
+                            <TextBlock Text="Rename" FontSize="12" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="BtnDeleteCurrentFolder" Click="BtnDeleteCurrentFolder_Click" ToolTipService.ToolTip="Delete Folder"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon FontSize="12" Glyph="&#xE74D;" />
+                            <TextBlock Text="Delete" FontSize="12" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <!--  List / Grid toggle  -->
+            <StackPanel
+                Grid.Column="1"
+                Orientation="Horizontal"
+                Spacing="4"
+                VerticalAlignment="Center">
+                <ToggleButton
+                    x:Name="BtnListViewToggle"
+                    IsChecked="True"
+                    Click="ViewToggle_Click"
+                    ToolTipService.ToolTip="List view">
+                    <FontIcon FontSize="14" Glyph="&#xE8FD;" />
+                </ToggleButton>
+                <ToggleButton
+                    x:Name="BtnGridViewToggle"
+                    IsChecked="False"
+                    Click="ViewToggle_Click"
+                    ToolTipService.ToolTip="Grid view">
+                    <FontIcon FontSize="14" Glyph="&#xECA5;" />
+                </ToggleButton>
+            </StackPanel>
         </Grid>
 
-        <ListView x:Name="FolderListView" Grid.Row="2" SelectionMode="None">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid Padding="8,10" ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Glyph="&#xE8B7;" FontSize="24"
-                                  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                            <TextBlock Text="{Binding Id}" FontSize="11"
-                                       Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                        </StackPanel>
-                        <Button Grid.Column="2" Tag="{Binding Id}" Content="Delete"
-                                Click="BtnDeleteFolder_Click"
-                                Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <!--  ── Row 1: Recently Opened horizontal strip (All Folders mode only) ──  -->
+        <StackPanel
+            x:Name="RecentSection"
+            Grid.Row="1"
+            Margin="0,0,0,20"
+            Visibility="Collapsed">
+            <TextBlock
+                Margin="0,0,0,10"
+                Style="{ThemeResource SubtitleTextBlockStyle}"
+                Text="🕐  Recently Opened" />
+            <ScrollViewer
+                HorizontalScrollBarVisibility="Auto"
+                HorizontalScrollMode="Enabled"
+                VerticalScrollMode="Disabled">
+                <StackPanel
+                    x:Name="RecentFilesPanel"
+                    Orientation="Horizontal"
+                    Spacing="10" />
+            </ScrollViewer>
+        </StackPanel>
+
+        <!--  ── Row 2: Create Folder expander (All Folders mode only) ─────────  -->
+        <Expander
+            x:Name="CreateFolderExpander"
+            Grid.Row="2"
+            Margin="0,0,0,16"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            Header="＋  Create New Folder"
+            Visibility="Collapsed">
+            <Grid ColumnSpacing="8" Margin="0,8,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="56" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="EmojiBox"
+                    Grid.Column="0"
+                    FontSize="18"
+                    MaxLength="2"
+                    PlaceholderText="📁"
+                    Text="📁"
+                    TextAlignment="Center" />
+                <TextBox
+                    x:Name="FolderNameBox"
+                    Grid.Column="1"
+                    PlaceholderText="Folder name…" />
+                <Button
+                    Grid.Column="2"
+                    Click="BtnCreateFolder_Click"
+                    Content="Create"
+                    Style="{ThemeResource AccentButtonStyle}" />
+            </Grid>
+        </Expander>
+
+        <!--  ── Row 3: Main content (ListView / GridView toggled) ─────────────  -->
+        <Grid Grid.Row="3">
+            <ListView
+                x:Name="ContentListView"
+                IsItemClickEnabled="True"
+                ItemClick="ContentItem_Click"
+                SelectionMode="Single"
+                Visibility="Visible" />
+            <GridView
+                x:Name="ContentGridView"
+                IsItemClickEnabled="True"
+                ItemClick="ContentItem_Click"
+                SelectionMode="Single"
+                Visibility="Collapsed"
+                Padding="0,4" />
+        </Grid>
     </Grid>
 </Page>

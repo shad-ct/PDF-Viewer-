@@ -6,14 +6,202 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MyPdfViewer.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="Transparent"
     mc:Ignorable="d">
 
-    <Grid Padding="24,16,24,16" RowSpacing="24">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Settings" />
-        <TextBlock Grid.Row="1" Text="This is the Settings page" />
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,16" Spacing="4" MaxWidth="680">
+
+            <!--  Page title  -->
+            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,20">
+                <FontIcon FontSize="28" Glyph="&#xE713;"
+                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                <TextBlock Text="Settings" Style="{ThemeResource TitleTextBlockStyle}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!--  ════════ APPEARANCE ════════════════════════════════════════  -->
+            <TextBlock Text="Appearance" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="0,4,0,8" />
+
+            <!--  Theme  -->
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="App Theme" FontWeight="SemiBold" />
+                        <TextBlock Text="Follow system, or lock to Light / Dark."
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12" />
+                    </StackPanel>
+                    <ComboBox x:Name="ThemeCombo" Grid.Column="1" MinWidth="160"
+                              SelectionChanged="ThemeCombo_SelectionChanged">
+                        <ComboBoxItem Content="System Default" Tag="Default" IsSelected="True" />
+                        <ComboBoxItem Content="Light" Tag="Light" />
+                        <ComboBoxItem Content="Dark" Tag="Dark" />
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <!--  ════════ PDF VIEWER ══════════════════════════════════════════  -->
+            <TextBlock Text="PDF Viewer" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="0,20,0,8" />
+
+            <!--  Default Zoom  -->
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Default Zoom Level" FontWeight="SemiBold" />
+                        <TextBlock Text="Starting zoom factor when opening a PDF (50 – 200%)."
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Slider x:Name="ZoomSlider"
+                                Width="180" Minimum="50" Maximum="200"
+                                StepFrequency="10" TickFrequency="50"
+                                TickPlacement="Outside" Value="100"
+                                ValueChanged="ZoomSlider_ValueChanged" />
+                        <TextBlock x:Name="ZoomValueLabel" Text="100%"
+                                   Width="44" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  Pen thickness  -->
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Freehand Pen Thickness" FontWeight="SemiBold" />
+                        <TextBlock Text="Stroke width used by the pen annotation tool."
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Slider x:Name="PenThicknessSlider"
+                                Width="160" Minimum="1" Maximum="12"
+                                StepFrequency="1" Value="3"
+                                ValueChanged="PenThicknessSlider_ValueChanged" />
+                        <TextBlock x:Name="PenThicknessLabel" Text="3 px"
+                                   Width="36" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  ════════ PRIVACY ═════════════════════════════════════════════  -->
+            <TextBlock Text="Privacy" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="0,20,0,8" />
+
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Clear Recently Opened" FontWeight="SemiBold" />
+                        <TextBlock Text="Erases LastOpened timestamps. Files remain tracked."
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12" />
+                    </StackPanel>
+                    <Button x:Name="BtnClearRecent" Grid.Column="1"
+                            Content="Clear History"
+                            Click="BtnClearRecent_Click"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}" />
+                </Grid>
+            </Border>
+
+            <!--  ════════ LIBRARY FOLDER ══════════════════════════════════════  -->
+            <TextBlock Text="Library Folder" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="0,20,0,8" />
+
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="Auto-Import Folder" FontWeight="SemiBold" />
+                        <TextBlock x:Name="LibraryFolderDesc"
+                                   Text="Scan and add all PDFs from a directory on your disk to 'All PDFs'."
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="12"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <Button x:Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click" />
+                        <Button x:Name="BtnClearFolder" Content="Clear" Click="BtnClearFolder_Click" Visibility="Collapsed" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!--  ════════ ABOUT ══════════════════════════════════════════════  -->
+            <TextBlock Text="About" Style="{ThemeResource SubtitleTextBlockStyle}"
+                       Margin="0,20,0,8" />
+
+            <Border
+                Padding="16"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Margin="0,0,0,4">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="PDF Viewer" FontWeight="SemiBold" FontSize="15" />
+                    <TextBlock Text="Version 1.0.0" FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="Built with WinUI 3 · Windows App SDK 2.1 · .NET 10"
+                               FontSize="12"
+                               Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                    <TextBlock Margin="0,8,0,0" FontSize="12"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               TextWrapping="WrapWholeWords">
+                        Pages are rasterised via the native Windows.Data.Pdf API.
+                        Full text selection (copy) requires integration with a PDF
+                        text-extraction library such as PDFium. Current implementation
+                        provides visual region selection for highlight and underline
+                        annotations.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
 </Page>
